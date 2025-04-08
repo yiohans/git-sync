@@ -1,2 +1,3 @@
-git/*
-repo/*
+git/
+repo/
+.env
