@@ -14,8 +14,6 @@ cleanup() {
     echo "$(date_formated): Exiting"
 }
 
-. .env
-
 REPO_DIR=${REPO_DIR:-/repo} # Directory to clone the repository into
 GIT_REF=${GIT_REF:-main}  # Default branch, can be overridden
 SYNC_INTERVAL=${SYNC_INTERVAL:-60} # Sync interval in seconds
@@ -32,7 +30,7 @@ fi
 GIT_BIN_PATH=$(which git)
 
 git() {
-    local retries=3
+    local retries=${MAX_RETRIES:-3}
     local count=0
     
     while [ $count -lt $retries ]; do
@@ -61,8 +59,6 @@ if [ -n "$GIT_USERNAME" ] && [ -n "$GIT_PASSWORD" ]; then
 username=$GIT_USERNAME
 password=$GIT_PASSWORD
 " | $GIT_BIN_PATH credential approve
-    
-    USING_CREDENTIALS="true"
 fi
 
 # Check if the repository directory exists
@@ -74,7 +70,14 @@ if [ -d "$GIT_DIR" ]; then
     rm -rf "$GIT_DIR"
 fi
 
-git clone --separate-git-dir $GIT_DIR --branch $GIT_REF $GIT_REPO $REPO_DIR
+# Initialize the git directory
+echo "$(date_formated): Clone git repository"
+if git clone --separate-git-dir $GIT_DIR --branch $GIT_REF $GIT_REPO $REPO_DIR ; then
+    echo "$(date_formated): Repository cloned successfully"
+else
+    echo "$(date_formated): Failed to clone repository"
+    exit 1
+fi
 
 while true; do
     # Get remote HEAD for the specific branch
