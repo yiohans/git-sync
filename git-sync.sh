@@ -136,8 +136,10 @@ while [ "$GITSYNC_ONETIME" = "false" ] ; do
     elif $DEBUG ; then
         echo "$(date_formated): No changes detected in ref $GITSYNC_REF"
     fi
-    # Update submodules
-    echo "$(date_formated): Updating submodules"
+    # Check for changes in submodules
+    if $DEBUG ; then echo "$(date_formated): Checking submodules"; fi
     git -C $GITSYNC_LINK submodule update --init --recursive --remote
+    if $DEBUG ; then echo "$(date_formated): Submodules updated successfully"; fi
+    # Sleep for the specified period
     sleep $GITSYNC_PERIOD
 done
