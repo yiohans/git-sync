@@ -16,9 +16,10 @@ cleanup() {
 
 GITSYNC_REF=${GITSYNC_REF:-main}  # Default branch, can be overridden
 GITSYNC_PERIOD=${GITSYNC_PERIOD:-60} # Sync interval in seconds
-GITSYNC_ONETIME=${GITSYNC_ONETIME:-false}
+GITSYNC_ONE_TIME=${GITSYNC_ONE_TIME:-false}
 
-GITSYNC_LINK=${GITSYNC_LINK:-/repo} # Directory to clone the repository into
+GITSYNC_ROOT=${GITSYNC_ROOT:-repo} # Root directory for the repository
+GITSYNC_LINK=${GITSYNC_LINK:-head} # Directory to clone the repository into
 GITSYNC_GITDIR=${GITSYNC_GITDIR:-/tmp/git} # Directory to store the git repository
 GITSYNC_STATEFILE=${GITSYNC_STATEFILE:-/tmp/state} # File to store the last known state of the repository
 
@@ -26,6 +27,8 @@ if [ -z "$GITSYNC_REPO" ]; then
     echo "Error: GITSYNC_REPO environment variable is required"
     exit 1
 fi
+
+REPO_DIR=/tmp/$GITSYNC_ROOT/$GITSYNC_LINK
 
 # Save original git command
 GIT_BIN_PATH=$(which git)
@@ -90,8 +93,8 @@ password=$GITSYNC_PASSWORD
 fi
 
 # Check if the repository directory exists
-if [ -d "$GITSYNC_LINK" ]; then
-    rm -rf "$GITSYNC_LINK"
+if [ -d "$REPO_DIR" ]; then
+    rm -rf "$REPO_DIR"
 fi
 # Check if the git directory exists
 if [ -d "$GITSYNC_GITDIR" ]; then
@@ -100,7 +103,7 @@ fi
 
 # Initialize the git directory
 echo "$(date_formated): Clone git repository"
-if git clone --jobs 4 --separate-git-dir $GITSYNC_GITDIR --recurse-submodules --shallow-submodules --remote-submodules --branch $GITSYNC_REF $GITSYNC_REPO $GITSYNC_LINK ; then
+if git clone --jobs 4 --separate-git-dir $GITSYNC_GITDIR --recurse-submodules --shallow-submodules --remote-submodules --branch $GITSYNC_REF $GITSYNC_REPO $REPO_DIR ; then
     echo "$(date_formated): Repository cloned successfully"
 else
     echo "$(date_formated): Failed to clone repository"
@@ -116,9 +119,14 @@ fi
 #     exit 1
 # fi
 
-while [ "$GITSYNC_ONETIME" = "false" ] ; do
+if $GITSYNC_ONE_TIME ; then
+    echo "$(date_formated): One-time sync mode enabled, exiting after initial sync"
+    exit 0
+fi
+
+while true ; do
     # Get remote HEAD for the specific branch
-    REMOTE_HASH=$(git -C $GITSYNC_LINK ls-remote origin $GITSYNC_REF | awk '{print $1}')
+    REMOTE_HASH=$(git -C $REPO_DIR ls-remote origin $GITSYNC_REF | awk '{print $1}')
     
     # Get last known state
     if [ -f "$GITSYNC_STATEFILE" ]; then
@@ -130,15 +138,15 @@ while [ "$GITSYNC_ONETIME" = "false" ] ; do
     # Check for changes
     if [ "$REMOTE_HASH" != "$LAST_HASH" ]; then
         echo "$(date_formated): Changes detected in ref $GITSYNC_REF, syncing repository"
-        git -C $GITSYNC_LINK fetch origin $GITSYNC_REF
-        git -C $GITSYNC_LINK reset --hard origin/$GITSYNC_REF
+        git -C $REPO_DIR fetch origin $GITSYNC_REF
+        git -C $REPO_DIR reset --hard origin/$GITSYNC_REF
         echo "$REMOTE_HASH" > "$GITSYNC_STATEFILE"
     elif $DEBUG ; then
         echo "$(date_formated): No changes detected in ref $GITSYNC_REF"
     fi
     # Check for changes in submodules
     if $DEBUG ; then echo "$(date_formated): Checking submodules"; fi
-    git -C $GITSYNC_LINK submodule update --init --recursive --remote
+    git -C $REPO_DIR submodule update --init --recursive --remote
     if $DEBUG ; then echo "$(date_formated): Submodules updated successfully"; fi
     # Sleep for the specified period
     sleep $GITSYNC_PERIOD
