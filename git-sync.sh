@@ -47,6 +47,24 @@ fi
 # Save original git command
 GIT_BIN_PATH=$(which git)
 
+if [[ "$DEBUG" == "true" ]]; then
+    echo "$(date_formated): Debug mode enabled"
+    echo "$(date_formated): GIT_BIN_PATH: $GIT_BIN_PATH"
+    echo "$(date_formated): GITSYNC_REPO: $GITSYNC_REPO"
+    echo "$(date_formated): GITSYNC_REF: $GITSYNC_REF"
+    echo "$(date_formated): GITSYNC_PERIOD: $GITSYNC_PERIOD"
+    echo "$(date_formated): GITSYNC_ONE_TIME: $GITSYNC_ONE_TIME"
+    echo "$(date_formated): GITSYNC_ROOT: $GITSYNC_ROOT"
+    echo "$(date_formated): GITSYNC_LINK: $GITSYNC_LINK"
+    echo "$(date_formated): GITSYNC_GITDIR: $GITSYNC_GITDIR"
+    echo "$(date_formated): GITSYNC_STATEFILE: $GITSYNC_STATEFILE"
+    echo "$(date_formated): REPO_DIR: $REPO_DIR"
+    echo "$(date_formated): GITSYNC_USERNAME: $GITSYNC_USERNAME"
+    echo "$(date_formated): GITSYNC_PASSWORD: $GITSYNC_PASSWORD"
+    echo "$(date_formated): GITSYNC_GIT_CONFIG: $GITSYNC_GIT_CONFIG"
+    echo "$(date_formated): GITSYNC_MAX_FAILURES: $GITSYNC_MAX_FAILURES"
+fi
+
 git() {
     local retries=${GITSYNC_MAX_FAILURES:-3}
     local count=0
