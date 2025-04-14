@@ -124,14 +124,14 @@ password=$GITSYNC_PASSWORD
 " | git credential approve
 fi
 
-# Check if the repository directory exists
-if [ -d "$REPO_DIR" ]; then
-    rm -rf "$REPO_DIR"
-fi
-# Check if the git directory exists
-if [ -d "$GITSYNC_GITDIR" ]; then
-    rm -rf "$GITSYNC_GITDIR"
-fi
+# # Check if the repository directory exists
+# if [ -d "$REPO_DIR" ]; then
+#     rm -rf "$REPO_DIR"
+# fi
+# # Check if the git directory exists
+# if [ -d "$GITSYNC_GITDIR" ]; then
+#     rm -rf "$GITSYNC_GITDIR"
+# fi
 
 # Initialize the git directory
 echo "$(date_formated): Clone git repository"
