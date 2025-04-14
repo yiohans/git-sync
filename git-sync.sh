@@ -30,6 +30,16 @@ fi
 
 REPO_DIR=/tmp/$GITSYNC_ROOT/$GITSYNC_LINK
 
+if [ ! -d "$(dirname $REPO_DIR)" ]; then
+    echo "$(date_formated): Creating directory $(dirname $REPO_DIR)"
+    mkdir -p $(dirname $REPO_DIR)
+fi
+
+if [ ! -d "$(dirname $GITSYNC_GITDIR)" ]; then
+    echo "$(date_formated): Creating directory $(dirname $GITSYNC_GITDIR)"
+    mkdir -p $(dirname $GITSYNC_GITDIR)
+fi
+
 # Save original git command
 GIT_BIN_PATH=$(which git)
 
