@@ -18,10 +18,10 @@ GITSYNC_REF=${GITSYNC_REF:-main}  # Default branch, can be overridden
 GITSYNC_PERIOD=${GITSYNC_PERIOD:-60} # Sync interval in seconds
 GITSYNC_ONE_TIME=${GITSYNC_ONE_TIME:-false}
 
-GITSYNC_ROOT=${GITSYNC_ROOT:-repo} # Root directory for the repository
+GITSYNC_ROOT=${GITSYNC_ROOT:-tmp/repo} # Root directory for the repository
 GITSYNC_LINK=${GITSYNC_LINK:-head} # Directory to clone the repository into
-GITSYNC_GITDIR=${GITSYNC_GITDIR:-/tmp/git} # Directory to store the git repository
-GITSYNC_STATEFILE=${GITSYNC_STATEFILE:-/tmp/state} # File to store the last known state of the repository
+GITSYNC_GITDIR=${GITSYNC_GITDIR:-$GITSYNC_ROOT/.git} # Directory to store the git repository
+GITSYNC_STATEFILE=${GITSYNC_STATEFILE:-state} # File to store the last known state of the repository
 
 if [ -z "$GITSYNC_REPO" ]; then
     echo "Error: GITSYNC_REPO environment variable is required"
@@ -32,7 +32,7 @@ if [[ "$GITSYNC_ONE_TIME" == "true" ]]; then
     echo "$(date_formated): One-time sync mode enabled, exiting after initial sync"
 fi
 
-REPO_DIR=/tmp/$GITSYNC_ROOT/$GITSYNC_LINK
+REPO_DIR=/$GITSYNC_ROOT/$GITSYNC_LINK
 
 if [ ! -d "$(dirname $REPO_DIR)" ]; then
     echo "$(date_formated): Creating directory $(dirname $REPO_DIR)"
