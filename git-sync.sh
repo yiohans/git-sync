@@ -28,6 +28,10 @@ if [ -z "$GITSYNC_REPO" ]; then
     exit 1
 fi
 
+if [[ "$GITSYNC_ONE_TIME" == "true" ]]; then
+    echo "$(date_formated): One-time sync mode enabled, exiting after initial sync"
+fi
+
 REPO_DIR=/tmp/$GITSYNC_ROOT/$GITSYNC_LINK
 
 if [ ! -d "$(dirname $REPO_DIR)" ]; then
@@ -129,8 +133,8 @@ fi
 #     exit 1
 # fi
 
-if $GITSYNC_ONE_TIME ; then
-    echo "$(date_formated): One-time sync mode enabled, exiting after initial sync"
+if [[ "$GITSYNC_ONE_TIME" == "true" ]] ; then
+    echo "$(date_formated): Sync completed, exiting"
     exit 0
 fi
 
