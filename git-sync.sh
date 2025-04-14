@@ -133,13 +133,15 @@ fi
 #     rm -rf "$GITSYNC_GITDIR"
 # fi
 
-# Initialize the git directory
-echo "$(date_formated): Clone git repository"
-if git clone --jobs 4 --separate-git-dir $GITSYNC_GITDIR --recurse-submodules --shallow-submodules --remote-submodules --branch $GITSYNC_REF $GITSYNC_REPO $REPO_DIR ; then
-    echo "$(date_formated): Repository cloned successfully"
-else
-    echo "$(date_formated): Failed to clone repository"
-    exit 1
+if [ ! -d "$REPO_DIR" ]; then
+    # Initialize the git directory
+    echo "$(date_formated): Clone git repository"
+    if git clone --jobs 4 --separate-git-dir $GITSYNC_GITDIR --recurse-submodules --shallow-submodules --remote-submodules --branch $GITSYNC_REF $GITSYNC_REPO $REPO_DIR ; then
+        echo "$(date_formated): Repository cloned successfully"
+    else
+        echo "$(date_formated): Failed to clone repository"
+        exit 1
+    fi
 fi
 
 # # Update submodules
