@@ -175,13 +175,13 @@ while true ; do
         git -C $REPO_DIR fetch origin $GITSYNC_REF
         git -C $REPO_DIR reset --hard origin/$GITSYNC_REF
         echo "$REMOTE_HASH" > "$GITSYNC_STATEFILE"
-    elif $DEBUG ; then
+    elif [[ "$DEBUG" == "true" ]] ; then
         echo "$(date_formated): No changes detected in ref $GITSYNC_REF"
     fi
     # Check for changes in submodules
-    if $DEBUG ; then echo "$(date_formated): Checking submodules"; fi
+    if [[ "$DEBUG" == "true" ]] ; then echo "$(date_formated): Checking submodules"; fi
     git -C $REPO_DIR submodule update --init --recursive --remote
-    if $DEBUG ; then echo "$(date_formated): Submodules updated successfully"; fi
+    if [[ "$DEBUG" == "true" ]] ; then echo "$(date_formated): Submodules updated successfully"; fi
     # Sleep for the specified period
     sleep $GITSYNC_PERIOD
 done
